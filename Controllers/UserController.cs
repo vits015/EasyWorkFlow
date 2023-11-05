@@ -101,6 +101,22 @@ namespace EasyWorkFlowAPI.Controllers
             _context.SaveChanges();
             return Ok("Usuario criado com sucesso!");
         }
+        [HttpPut("AddJobRuleUser")]
+        [Authorize]
+        public ActionResult<dynamic>AddJobRuleUser(int userId, int jobRoleId)
+        {
+            User user = _context.Users.SingleOrDefault(u => u.Id == userId);
+            JobRole jobRole = _context.JobRoles.SingleOrDefault(jr => jr.Id == jobRoleId);
+
+            if (user == null || jobRole == null)
+                return NotFound(new { message = "Usuário ou cargo não encontrado" });            
+
+            user.JobRole = jobRole;
+            _context.Update(user);
+            _context.SaveChanges();
+
+            return Ok(new { message = $"Cargo {jobRole.Name} foi adicionado para {user.Name}", user });
+        }
         
     }
 }

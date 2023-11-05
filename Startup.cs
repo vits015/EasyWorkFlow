@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace EasyWorkFlowAPI
 {
@@ -43,6 +44,9 @@ namespace EasyWorkFlowAPI
                     ValidateAudience = false
                 };
             });
+            //services.AddMvc().AddJsonOptions(options => {
+            //    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            //});
         }
         public void Configure(WebApplication app, IWebHostEnvironment enviroment)
         {
