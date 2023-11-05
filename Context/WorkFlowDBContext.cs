@@ -34,10 +34,6 @@ namespace EasyWorkFlowAPI.Context
                     ((BaseEntity)entity.Entity).CreatedAt = timeStamp;
                 }
             }
-
-
-
-
             return base.SaveChanges();
         }
 

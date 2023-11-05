@@ -11,6 +11,9 @@ using EasyWorkFlowAPI.Utils;
 using Microsoft.SqlServer.Server;
 using EasyWorkFlowAPI.Utils;
 using Microsoft.DiaSymReader;
+using Microsoft.AspNetCore.Authorization;
+using EasyWorkFlowAPI.DTOs;
+using EasyWorkFlowAPI.Services;
 
 namespace EasyWorkFlowAPI.Controllers
 {
@@ -27,23 +30,25 @@ namespace EasyWorkFlowAPI.Controllers
         }
 
         [HttpPost("Login")]
-        public IActionResult Login(string username, string password)
+        [AllowAnonymous]
+        public ActionResult<dynamic> Login(UserDTO userDTO)
         {
             //retorna um usuário caso encontre no banco com os parametros informados
-            var user = _context.Users.Single(u => u.Name.Equals(username)); //busca Usuario pelo nome
-                                                                            //
+            var password = SecretHasher.Hash(userDTO.Password);            
+            var user = _context.Users.Single(u => u.Name.Equals(userDTO.Name)); //busca Usuario pelo nome             
             if (user != null)
             {
-                if (SecretHasher.Verify(password, user.PasswordHash))
-                {
-                    return Ok("Login efetuado com Sucesso!"); //Verifica se a senha está correta
-                }
-                return BadRequest("Usuário ou Senha inválidos");
+                if (!SecretHasher.Verify(userDTO.Password, user.PasswordHash))
+                    return NotFound(new { message = "Usuário ou senha inválidos" });
             }
-            else
+            userDTO.Password = string.Empty;
+            var token = TokenService.GenerateToken(userDTO);            
+            return new
             {
-                return BadRequest("Usuário ou Senha inválidos");
-            }
+                user = user!.Name,
+                token = token
+            };
+
         }
 
 
