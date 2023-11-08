@@ -4,11 +4,13 @@ using EasyWorkFlowAPI.Models;
 using EasyWorkFlowAPI.DTOs;
 using EasyWorkFlowAPI.Utils;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace EasyWorkFlowAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly WorkFlowDBContext _context;
@@ -18,10 +20,11 @@ namespace EasyWorkFlowAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+
         public ActionResult<dynamic> GetUsers()
         {
-            List<User> userList = new List<User>(_context.Users);
+            var data = _context.Users.Include(x => x.JobRole);
+            List<User> userList = new List<User>(data);
             foreach (User user in userList)
             {
                 user.PasswordHash = string.Empty;
@@ -30,7 +33,7 @@ namespace EasyWorkFlowAPI.Controllers
         }
 
         [HttpGet("GetUserByName")]
-        [Authorize]
+
         public ActionResult<dynamic> GetUserByName(string name)
         {
             var user = _context.Users.SingleOrDefault(x => x.Name.Equals(name));
@@ -44,7 +47,7 @@ namespace EasyWorkFlowAPI.Controllers
         }
 
         [HttpPut("UpdateUser")]
-        [Authorize]
+
         public ActionResult<dynamic> UpdateUser(int id, UserDTO userDTO)
         {
             User user = _context.Users.Single(x => x.Id == id);
@@ -68,7 +71,7 @@ namespace EasyWorkFlowAPI.Controllers
             );
         }
         [HttpDelete]
-        [Authorize]
+
         public ActionResult<dynamic> DeleteUser(int id)
         {
             User user = _context.Users.SingleOrDefault(u => u.Id == id);
@@ -83,7 +86,7 @@ namespace EasyWorkFlowAPI.Controllers
 
 
         [HttpPost]
-        [Authorize]
+
         public ActionResult<dynamic> CreateUser(UserDTO formData)
         {
             string passwordHash = SecretHasher.Hash(formData.Password);
@@ -102,7 +105,7 @@ namespace EasyWorkFlowAPI.Controllers
             return Ok("Usuario criado com sucesso!");
         }
         [HttpPut("AddJobRuleUser")]
-        [Authorize]
+
         public ActionResult<dynamic>AddJobRuleUser(int userId, int jobRoleId)
         {
             User user = _context.Users.SingleOrDefault(u => u.Id == userId);

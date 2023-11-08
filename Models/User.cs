@@ -7,9 +7,10 @@ namespace EasyWorkFlowAPI.Models
     public class User : BaseEntity
     {
         [Key]
-        public int Id { get; set; }        
+        public int Id { get; set; }
         public bool IsMaster { get; set; } = false;
-        public JobRole ? JobRole { get; set; }       
+        public int? JobRoleId { get; set; }
+        public JobRole JobRole { get; set; }
         public string Name { get; set; }
         public string Cpf { get; set; }
         public DateTime BirthDate { get; set; }
